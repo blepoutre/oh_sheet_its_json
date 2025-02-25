@@ -29,8 +29,16 @@ gem "dartsass-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# For spreadsheet handling
+gem 'roo'  # For reading spreadsheets
+gem 'caxlsx' # For creating Excel files
+gem 'caxlsx_rails' # Rails integration for caxlsx
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
+
+# Bootstrap CSS framework
+gem "bootstrap", "~> 5.3"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -50,6 +58,7 @@ gem "bootsnap", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
+
 end
 
 group :development do
@@ -63,6 +72,10 @@ group :development do
   # gem "spring"
 
   gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
+
+  # Add better error pages
+  gem 'better_errors'
+  gem 'binding_of_caller'
 end
 
 group :test do

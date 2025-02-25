@@ -1,0 +1,21 @@
+<div class="main-container">
+  <div class="spreadsheet-view" data-controller="spreadsheet">
+    <div class="header">
+      <h2>Spreadsheet View</h2>
+      <button data-action="click->spreadsheet#toJson" class="convert-button">
+        Convert to JSON →
+      </button>
+    </div>
+    <div id="spreadsheetContainer" class="editor-container" data-spreadsheet-target="container"></div>
+  </div>
+
+  <div class="json-editor" data-controller="json-editor">
+    <div class="header">
+      <h2>JSON Editor</h2>
+      <button data-action="click->json-editor#toSpreadsheet" class="convert-button">
+        ← Convert to Spreadsheet
+      </button>
+    </div>
+    <div id="jsonEditorContainer" class="editor-container" data-json-editor-target="container"></div>
+  </div>
+</div>
