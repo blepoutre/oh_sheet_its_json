@@ -1,24 +1,30 @@
-# README
+# Oh Sheet! It's JSON
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Description
+### English
+A small application developed for personal use. It allows you to convert JSON files into spreadsheets, making it easier to modify JSON data by presenting it in a more readable format.
 
-Things you may want to cover:
+### Français
+Une petite application développée pour un besoin personnel. Elle permet de convertir des fichiers JSON en tableurs, facilitant ainsi la modification de données JSON en les rendant plus lisibles.
 
-* Ruby version
+## Installation
+### English
+1. Clone the repository to your machine.
+2. Install any necessary dependencies (if applicable).
+3. Run the application.
 
-* System dependencies
+### Français
+1. Clonez le repository sur votre machine.
+2. Installez les dépendances nécessaires (si applicable).
+3. Lancez l'application.
 
-* Configuration
+## Usage
+### English
+- Upload a JSON file.
+- Modify the data in the spreadsheet.
+- Save your changes back to JSON.
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### Français
+- Téléchargez un fichier JSON.
+- Modifiez les données dans le tableur.
+- Enregistrez vos modifications en JSON.
