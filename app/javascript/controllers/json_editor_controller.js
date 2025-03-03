@@ -138,7 +138,15 @@ export default class extends Controller {
       }
 
       console.log("Tentative de mise à jour du spreadsheet avec:", jsonData);
-      const success = spreadsheetController.updateFromJson(jsonData);
+
+      // 1. Aplatir le JSON en format de tableau
+      const flattenedData = this.flattenJsonToSpreadsheet(jsonData);
+
+      // 2. Dé-aplatir les données pour les remettre dans la structure JSON originale
+      const unflattenedData = this.unflattenJson(flattenedData.data);
+
+      // 3. Mettre à jour le tableau Handsontable avec les données dé-aplaties
+      const success = spreadsheetController.updateFromJson(unflattenedData);
 
       if (!success) {
         console.error("Échec de la mise à jour du tableau");
@@ -152,65 +160,43 @@ export default class extends Controller {
   }
 
   flattenJsonToSpreadsheet(json) {
-    console.log("Flattening JSON to spreadsheet format...");
     const jsonArray = Array.isArray(json) ? json : [json];
-    console.log("Treating as array with length:", jsonArray.length);
-
-    const flattenObject = (obj, prefix = "") => {
-      return Object.keys(obj).reduce((acc, key) => {
-        const propName = prefix ? `${prefix}.${key}` : key;
-
-        if (obj[key] === null) {
-          return { ...acc, [propName]: "" };
-        } else if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
-          return { ...acc, ...flattenObject(obj[key], propName) };
-        } else if (Array.isArray(obj[key])) {
-          // Simplification pour les tableaux
-          if (obj[key].length === 0) {
-            return { ...acc, [propName]: "[]" };
-          }
-
-          // Pour les tableaux d'objets
-          if (typeof obj[key][0] === "object") {
-            const arrayFlattened = obj[key].map((item, index) =>
-              flattenObject(item, `${propName}[${index}]`)
-            );
-            return {
-              ...acc,
-              ...arrayFlattened.reduce((a, b) => ({ ...a, ...b }), {}),
-            };
-          }
-
-          // Pour les tableaux simples
-          return { ...acc, [propName]: JSON.stringify(obj[key]) };
-        } else {
-          return { ...acc, [propName]: obj[key] };
-        }
-      }, {});
-    };
-
-    const flattenedData = jsonArray.map((item) => flattenObject(item));
-    console.log("Flattened objects:", flattenedData);
-
     const headers = Array.from(
-      new Set(flattenedData.flatMap((obj) => Object.keys(obj)))
+      new Set(jsonArray.flatMap((obj) => Object.keys(obj)))
     );
-    console.log("Generated headers:", headers);
+    const data = [headers];
 
-    // Créer les données pour le tableau
-    const data = [];
-    data.push(headers); // Première ligne = en-têtes
-
-    // Ajout des données
-    flattenedData.forEach((obj) => {
+    jsonArray.forEach((obj) => {
       const row = headers.map((header) => {
         const value = obj[header];
+        if (typeof value === "object" && value !== null) {
+          return JSON.stringify(value); // Convertir les objets en chaînes JSON
+        }
         return value !== undefined ? value : "";
       });
       data.push(row);
     });
 
-    console.log("Final data structure:", data);
     return { headers, data };
+  }
+
+  unflattenJson(data) {
+    const headers = data[0];
+    const rows = data.slice(1);
+
+    return rows.map((row) => {
+      const obj = {};
+      headers.forEach((header, index) => {
+        const value = row[index];
+        if (value !== "") {
+          try {
+            obj[header] = JSON.parse(value); // Essayer de convertir en objet JSON
+          } catch (e) {
+            obj[header] = value; // Si ce n'est pas un JSON valide, garder la chaîne
+          }
+        }
+      });
+      return obj;
+    });
   }
 }
