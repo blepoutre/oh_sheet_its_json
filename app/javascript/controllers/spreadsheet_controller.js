@@ -104,13 +104,19 @@ export default class extends Controller {
           const value = row[index];
           // Ne pas inclure les valeurs null ou vides
           if (value !== null && value !== "") {
-            if (header.startsWith("children") && header !== "children") {
-              // Extraire le nom de la propriété enfant (ex: childrenName -> name)
-              const childProp = header.replace("children", "");
-              const childKey =
-                childProp.charAt(0).toLowerCase() + childProp.slice(1);
-              childrenData[childKey] = value;
-            } else if (header !== "children") {
+            // Vérifier si le header suit le pattern "parentKey + CapitalizedKey"
+            const match = header.match(/^([a-z]+)([A-Z].*)/);
+            if (match) {
+              const [_, parentKey, childKey] = match;
+              // Initialiser le tableau parent s'il n'existe pas
+              if (!obj[parentKey]) {
+                obj[parentKey] = [{}];
+              }
+              // Ajouter la propriété enfant avec première lettre en minuscule
+              const normalizedChildKey =
+                childKey.charAt(0).toLowerCase() + childKey.slice(1);
+              obj[parentKey][0][normalizedChildKey] = value;
+            } else {
               obj[header] = value;
             }
           }
@@ -154,16 +160,28 @@ export default class extends Controller {
       const transformData = (data) => {
         return data.map((item) => {
           const transformed = { ...item };
-          if (Array.isArray(item.children) && item.children.length > 0) {
-            const child = item.children[0]; // On prend le premier enfant
-            delete transformed.children;
-            // Ajouter les propriétés de l'enfant avec le préfixe "children"
-            Object.keys(child).forEach((key) => {
-              transformed[
-                `children${key.charAt(0).toUpperCase()}${key.slice(1)}`
-              ] = child[key];
-            });
-          }
+
+          // Parcourir chaque clé dans l'objet
+          Object.keys(item).forEach((key) => {
+            const value = item[key];
+
+            // Si la valeur est un tableau d'objets
+            if (Array.isArray(value) && value.length > 0) {
+              const child = value[0]; // On prend le premier objet du tableau
+              // Supprimer la clé initiale du tableau d'objets
+              delete transformed[key];
+              // Ajouter les propriétés de l'enfant avec le préfixe "children"
+              Object.keys(child).forEach((childkey) => {
+                transformed[
+                  `${key.charAt(0)}${key.slice(1)}${
+                    childkey.charAt(0).toUpperCase() + childkey.slice(1)
+                  }`
+                ] = child[childkey];
+              });
+            }
+          });
+
+          console.log("Transformed data:", transformed);
           return transformed;
         });
       };
