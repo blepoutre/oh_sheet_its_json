@@ -104,13 +104,19 @@ export default class extends Controller {
           const value = row[index];
           // Ne pas inclure les valeurs null ou vides
           if (value !== null && value !== "") {
-            if (header.startsWith("children") && header !== "children") {
-              // Extraire le nom de la propriété enfant (ex: childrenName -> name)
-              const childProp = header.replace("children", "");
-              const childKey =
-                childProp.charAt(0).toLowerCase() + childProp.slice(1);
-              childrenData[childKey] = value;
-            } else if (header !== "children") {
+            // Vérifier si le header suit le pattern "parentKey + CapitalizedKey"
+            const match = header.match(/^([a-z]+)([A-Z].*)/);
+            if (match) {
+              const [_, parentKey, childKey] = match;
+              // Initialiser le tableau parent s'il n'existe pas
+              if (!obj[parentKey]) {
+                obj[parentKey] = [{}];
+              }
+              // Ajouter la propriété enfant avec première lettre en minuscule
+              const normalizedChildKey =
+                childKey.charAt(0).toLowerCase() + childKey.slice(1);
+              obj[parentKey][0][normalizedChildKey] = value;
+            } else {
               obj[header] = value;
             }
           }
