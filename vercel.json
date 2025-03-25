@@ -1,5 +1,8 @@
 {
   "version": 2,
-  "builds": [],
-  "routes": [{ "src": "/(.*)", "dest": "/" }]
+  "builds": [
+    { "src": "bin/*", "use": "@vercel/static" },
+    { "src": "config.ru", "use": "@vercel/ruby" }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "config.ru" }]
 }
